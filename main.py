@@ -1,28 +1,5 @@
 from grid import Grid
-import tkinter
-
-
-class Window:
-    def __init__(self, n, size):
-        # n = num cells in each row/column
-        # size = cell width/height in pixels
-        self.root = tkinter.Tk()
-        self.root.title("Conway's Game of Life")
-
-        # Create the canvas.
-        self.canvas = tkinter.Canvas(self.root, width=n*size, height=n*size)
-        self.canvas.pack()
-
-        # Create a NxN grid of dead cells.
-        for x in range(n):
-            for y in range(n):
-                x0 = x * size
-                y0 = y * size
-                x1 = x0 + size
-                y1 = y0 + size
-                # Each cell has a 1px border.
-                self.canvas.create_rectangle(x0+1, y0+1, x1-1, y1-1,
-                                             fill="black")
+from window import Window
 
 
 class Application:
@@ -31,20 +8,29 @@ class Application:
         self.SIZE = 12 # cell width/height in pixels
         self.grid = Grid(self.N)
         self.window = Window(self.N, self.SIZE)
-    
-    def update(self):
-        self.grid.update()
-
+        # Draw initial state of grid to canvas.
         for x in range(self.N):
             for y in range(self.N):
-                if (self.grid._cells[x][y]):
-                    self.window.canvas.itemconfig(x * self.N + y + 1, fill="white")
-                else:
-                    self.window.canvas.itemconfig(x * self.N + y + 1, fill="black")
+                cell_id = self._cell_id(x, y)
+                is_alive = self.grid.cell(x, y)
+                self.window.update_cell(cell_id, is_alive)
 
+    def update(self):
+        # Use the grid's changes to update the canvas.
+        for cell, is_alive in self.grid.update():
+            cell_id = self._cell_id(cell[0], cell[1])
+            self.window.update_cell(cell_id, is_alive)
         self.window.root.after(250, self.update)
+    
+    def _cell_id(self, x, y):
+        # Return the cell's id on the window's canvas.
+        return (x * self.N) + y + 1
 
 
-app = Application()
-app.update()
-app.window.root.mainloop() # Why does this need to be here?!
+def main():
+    app = Application()
+    app.update()
+    app.window.root.mainloop() # Why does this need to be here?!
+
+
+main()

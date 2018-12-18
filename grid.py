@@ -1,5 +1,6 @@
 import copy
 
+
 class Grid:
     def __init__(self, n=10):
         # Create a NxN grid of dead cells.
@@ -14,11 +15,16 @@ class Grid:
         self._cells[0][1] = True
         self._cells[1][1] = True
         self._cells[2][1] = True
+    
+    def cell(self, x, y):
+        # Return the state of the cell at (x, y).
+        return self._cells[x][y]
 
     def update(self):
         # Update the state of each cell based on the rules.
-        # TODO: Update this method to return a list of cells that have changed.
+        # Return a list of changed cells' positions and new values.
         new_cells = copy.deepcopy(self._cells)
+        changes = []
 
         n = len(self._cells)
         for x in range(n):
@@ -27,10 +33,13 @@ class Grid:
                 if (self._cells[x][y]):
                     if (lives < 2) or (lives > 3):
                         new_cells[x][y] = False
+                        changes.append([(x, y), new_cells[x][y]])
                 elif (lives == 3):
                     new_cells[x][y] = True
+                    changes.append([(x, y), new_cells[x][y]])
         
         self._cells = new_cells
+        return changes
 
     def _count_live_neighbors(self, x, y, n):
         top = (x - 1) % n
