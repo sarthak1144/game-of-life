@@ -10,7 +10,7 @@ class Grid:
         for x in range(n):
             self._cells.append([])
             for _ in range(n):
-                # Each cells has a 50% chance to be alive initially.
+                # Each cell has a 50% chance to be alive initially.
                 self._cells[x].append(random.choice([True, False]))
     
     def cell(self, x, y):
