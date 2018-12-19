@@ -1,4 +1,5 @@
 import copy
+import random
 
 
 class Grid:
@@ -9,12 +10,8 @@ class Grid:
         for x in range(n):
             self._cells.append([])
             for _ in range(n):
-                self._cells[x].append(False)
-
-        # Add a blinker.
-        self._cells[0][1] = True
-        self._cells[1][1] = True
-        self._cells[2][1] = True
+                # Each cells has a 50% chance to be alive initially.
+                self._cells[x].append(random.choice([True, False]))
     
     def cell(self, x, y):
         # Return the state of the cell at (x, y).
@@ -23,6 +20,7 @@ class Grid:
     def update(self):
         # Update the state of each cell based on the rules.
         # Return a list of changed cells' positions and new values.
+        # TODO: Can this methed be refactored and cleaned up?
         new_cells = copy.deepcopy(self._cells)
         changes = []
 

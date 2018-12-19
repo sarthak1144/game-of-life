@@ -4,8 +4,8 @@ import tkinter
 class Window:
     def __init__(self, n, size):
         # n = num cells in each row/column, size = cell width/height in pixels
-        self.root = tkinter.Tk()
-        self.root.title("Conway's Game of Life")
+        self._root = tkinter.Tk()
+        self._root.title("Conway's Game of Life")
         self._create_widgets(n, size)
 
     def update_cell(self, id, is_alive):
@@ -13,9 +13,12 @@ class Window:
             self.canvas.itemconfig(id, fill="white")
         else:
             self.canvas.itemconfig(id, fill="black")
+
+    def set_callback_after(self, func, ms):
+        self._root.after(ms, func)
     
     def _create_widgets(self, n, size):
-        self.canvas = tkinter.Canvas(self.root, width=n*size, height=n*size)
+        self.canvas = tkinter.Canvas(self._root, width=n*size, height=n*size)
         self.canvas.pack()
         # Populate the canvas with a NxN grid of dead cells.
         for x in range(n):
