@@ -4,8 +4,7 @@ import random
 
 class Grid:
     def __init__(self, n=10):
-        # Create a NxN grid of dead cells.
-        # True == ALIVE, False == DEAD
+        # Create a NxN grid of cells. True == ALIVE, False == DEAD
         self._cells = []
         for x in range(n):
             self._cells.append([])
@@ -14,11 +13,11 @@ class Grid:
                 self._cells[x].append(random.choice([True, False]))
     
     def cell(self, x, y):
-        # Return the state of the cell at (x, y).
+        # Return the current state of the cell at (x, y).
         return self._cells[x][y]
 
     def update(self):
-        # Update the state of each cell based on the rules.
+        # Update the state of each cell based on the game's rules.
         # Return a list of changed cells' positions and new values.
         # TODO: Can this methed be refactored and cleaned up?
         new_cells = copy.deepcopy(self._cells)
