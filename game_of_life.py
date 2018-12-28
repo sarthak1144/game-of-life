@@ -3,20 +3,22 @@
     Conway's Game of Life
     December 2018
 """
-import copy
-import random
 import tkinter
+
+from random import choice
+from copy import deepcopy
 
 
 class Grid:
     """Create a NxN grid of cells."""
     def __init__(self, n):
+        self._size = n # num cells in each row/column
         self._cells = []
-        for x in range(n):
+        for x in range(self._size):
             self._cells.append([])
-            for _ in range(n):
-                # Each cell has a 50% chance of being alive initially.
-                self._cells[x].append(random.choice([True, False]))
+            for _ in range(self._size):
+                # Each cell has a 25% chance of being alive initially.
+                self._cells[x].append(choice([True, False, False, False]))      # TODO: Is there a better way to do this?
     
     """Return the current state of the cell located at (x,y)."""
     def cell(self, x, y):
@@ -24,31 +26,30 @@ class Grid:
 
     """Update the state of each cell based on the game's rules."""
     def update(self):
-        # TODO: Refactor this method.
-        new_cells = copy.deepcopy(self._cells)
-        changes = []
+        # TODO: Comment.
+        self._new_cells = deepcopy(self._cells)
+        self._changes = []
+        self._update_cells()
+        self._cells = self._new_cells
+        return self._changes
 
-        n = len(self._cells)
-        for x in range(n):
-            for y in range(n):
-                lives = self._count_live_neighbors(x, y, n)
-                if (self.cell(x, y)):
-                    if (lives < 2) or (lives > 3):
-                        new_cells[x][y] = False
-                        changes.append([(x, y), new_cells[x][y]])
-                elif (lives == 3):
-                    new_cells[x][y] = True
-                    changes.append([(x, y), new_cells[x][y]])
-        
-        self._cells = new_cells
-        return changes
+    # TODO: Update comments.
+    def _update_cells(self):
+        for x in range(self._size):
+            for y in range(self._size):
+                lives = self._count_live_neighbors(x, y)
+                if self.cell(x, y):
+                    if lives < 2 or lives > 3:
+                        self._switch_cell(x, y) 
+                elif lives == 3:
+                    self._switch_cell(x, y)  
 
     """Count the number of live neighbors for cell at (x,y)."""
-    def _count_live_neighbors(self, x, y, n):
-        top = (x - 1) % n
-        left = (y - 1) % n
-        right = (y + 1) % n
-        bottom = (x + 1) % n
+    def _count_live_neighbors(self, x, y):
+        top = (x - 1) % self._size
+        left = (y - 1) % self._size
+        right = (y + 1) % self._size
+        bottom = (x + 1) % self._size
 
         lives = 0
         lives += int(self.cell(top, left))
@@ -61,13 +62,18 @@ class Grid:
         lives += int(self.cell(bottom, right))
 
         return lives
+
+    """Flip the current state of the cell and record the change."""
+    def _switch_cell(self, x, y):
+        self._new_cells[x][y] = not self._new_cells[x][y]
+        self._changes.append([(x, y), self._new_cells[x][y]])
 # end class Grid
 
 
 class App:
     def __init__(self):
         self.n = 50     # num cells in each row/column
-        self.size = 12  # cell width/heigh in pixels
+        self.cell_size_in_pixels = 12
         self.job = None # current job id for root.after()
 
         self.grid = Grid(self.n)
@@ -84,7 +90,7 @@ class App:
         self.root = tkinter.Tk()
         self.root.title("Conway's Game of Life")
 
-        sz = self.n * self.size
+        sz = self.n * self.cell_size_in_pixels
         self.canvas = tkinter.Canvas(self.root, width=sz, height=sz)
         self.canvas.pack()
         
@@ -95,10 +101,10 @@ class App:
     def _draw_grid(self):
         for x in range(self.n):
             for y in range(self.n):
-                x0 = x * self.size
-                y0 = y * self.size
-                x1 = x0 + self.size
-                y1 = y0 + self.size
+                x0 = x * self.cell_size_in_pixels
+                y0 = y * self.cell_size_in_pixels
+                x1 = x0 + self.cell_size_in_pixels
+                y1 = y0 + self.cell_size_in_pixels
                 if self.grid.cell(x, y):
                     color = "white"
                 else:
@@ -110,7 +116,7 @@ class App:
         self.job = self.root.after(500, self._play)
         self.button.config(text="Pause", command=self._pause)
         for cell, is_alive in self.grid.update():
-            id = (cell[0] * self.n) + cell[1] + 1 # TODO: Explain this.
+            id = (cell[0] * self.n) + cell[1] + 1                               # TODO: Explain this.
             if is_alive:
                 self.canvas.itemconfig(id, fill="white")
             else:
