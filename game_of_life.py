@@ -1,9 +1,15 @@
+"""
+    Bradley Gatewood
+    Conway's Game of Life
+    December 2019
+"""
 import copy
 import random
 import tkinter
 
 
 class Grid:
+    """Create a NxN grid of cells."""
     def __init__(self, n):
         self._cells = []
         for x in range(n):
@@ -12,11 +18,14 @@ class Grid:
                 # Each cell has a 50% chance of being alive initially.
                 self._cells[x].append(random.choice([True, False]))
     
+    """Return the current state of the cell located at (x,y)."""
     def cell(self, x, y):
         return self._cells[x][y]
 
+    """Update the state of each cell based on the game's rules."""
     def update(self):
         # TODO: Refactor this method.
+        # Make it easier to understand and simplify the return data.
         new_cells = copy.deepcopy(self._cells)
         changes = []
 
@@ -35,6 +44,7 @@ class Grid:
         self._cells = new_cells
         return changes
 
+    """Count the number of live neighbors of cell at (x,y)."""
     def _count_live_neighbors(self, x, y, n):
         top = (x - 1) % n
         left = (y - 1) % n
@@ -55,56 +65,64 @@ class Grid:
 # end class Grid
 
 
-n = 50      # num cells in each row/column
-size = 12   # cell width/height in pixels
+class App:
+    def __init__(self):
+        self.n = 50     # num cells in each row/column
+        self.size = 12  # cell width/heigh in pixels
+        self.job = None # current job id for root.after()
 
-job = None
+        # Create the grid.
+        self.grid = Grid(self.n)
+
+    def main(self):
+        """Create the window and start the main event loop."""
+        # TODO: Refactor (shorten) this method.
+        # Create the root window.
+        self.root = tkinter.Tk()
+        self.root.title("Conway's Game of Life")
+
+        # Create the canvas.
+        sz = self.n * self.size
+        self.canvas = tkinter.Canvas(self.root, width=sz, height=sz)
+        self.canvas.pack()
+
+        # Draw the initial grid to the canvas.
+        for x in range(self.n):
+            for y in range(self.n):
+                x0 = x * self.size
+                y0 = y * self.size
+                x1 = x0 + self.size
+                y1 = y0 + self.size
+                if self.grid.cell(x, y):
+                    color = "white"
+                else:
+                    color = "black"
+                self.canvas.create_rectangle(x0, y0, x1, y1, fill=color)
+        
+        # Create the play/pause button.
+        self.button = tkinter.Button(self.root, text="Play", command=self.play)
+        self.button.pack(expand=tkinter.YES, fill=tkinter.BOTH)
+
+        # Start the Tk event loop.
+        self.root.mainloop()
+
+    def play(self):
+        """Insert comments here."""
+        self.job = self.root.after(500, self.play)
+        self.button.config(text="Pause", command=self.pause)
+        for cell, is_alive in self.grid.update():
+            id = (cell[0] * self.n) + cell[1] + 1 # TODO: Explain this.
+            if is_alive:
+                self.canvas.itemconfig(id, fill="white")
+            else:
+                self.canvas.itemconfig(id, fill="black")
+
+    def pause(self):
+        """Insert comments here."""
+        self.root.after_cancel(self.job)
+        self.button.config(text="Play", command=self.play)
+# end class App
 
 
-def play():
-    global job
-    job = root.after(500, play)
-    button.config(text="Pause", command=pause)
-    for cell, is_alive in grid.update():
-        id = (cell[0] * n) + cell[1] + 1
-        if is_alive:
-            canvas.itemconfig(id, fill="white")
-        else:
-            canvas.itemconfig(id, fill="black")
-
-
-def pause():
-    root.after_cancel(job)
-    button.config(text="Play", command=play)
-
-
-# Create the root window.
-root = tkinter.Tk()
-root.title("Conway's Game of Life")
-
-# Create the grid.
-grid = Grid(n)
-
-# Create the canvas.
-canvas = tkinter.Canvas(root, width=n*size, height=n*size)
-canvas.pack()
-
-# Draw the initial grid to the canvas.
-for x in range(n):
-    for y in range(n):
-        x0 = x * size
-        y0 = y * size
-        x1 = x0 + size
-        y1 = y0 + size
-        if grid.cell(x, y):
-            color = "white"
-        else:
-            color = "black"
-        canvas.create_rectangle(x0, y0, x1, y1, fill=color)
-
-# Create the play/pause button.
-button = tkinter.Button(root, text="Play", command=play)
-button.pack(expand=tkinter.YES, fill=tkinter.BOTH)
-
-# Start the Tk event loop.
-root.mainloop()
+app = App()
+app.main()
