@@ -1,7 +1,7 @@
 """
     Bradley Gatewood
     Conway's Game of Life
-    December 2019
+    December 2018
 """
 import copy
 import random
@@ -25,7 +25,6 @@ class Grid:
     """Update the state of each cell based on the game's rules."""
     def update(self):
         # TODO: Refactor this method.
-        # Make it easier to understand and simplify the return data.
         new_cells = copy.deepcopy(self._cells)
         changes = []
 
@@ -33,7 +32,7 @@ class Grid:
         for x in range(n):
             for y in range(n):
                 lives = self._count_live_neighbors(x, y, n)
-                if (self._cells[x][y]):
+                if (self.cell(x, y)):
                     if (lives < 2) or (lives > 3):
                         new_cells[x][y] = False
                         changes.append([(x, y), new_cells[x][y]])
@@ -44,7 +43,7 @@ class Grid:
         self._cells = new_cells
         return changes
 
-    """Count the number of live neighbors of cell at (x,y)."""
+    """Count the number of live neighbors for cell at (x,y)."""
     def _count_live_neighbors(self, x, y, n):
         top = (x - 1) % n
         left = (y - 1) % n
@@ -52,14 +51,14 @@ class Grid:
         bottom = (x + 1) % n
 
         lives = 0
-        lives += int(self._cells[top][left])
-        lives += int(self._cells[top][y])
-        lives += int(self._cells[top][right])
-        lives += int(self._cells[x][left])
-        lives += int(self._cells[x][right])
-        lives += int(self._cells[bottom][left])
-        lives += int(self._cells[bottom][y])
-        lives += int(self._cells[bottom][right])
+        lives += int(self.cell(top, left))
+        lives += int(self.cell(top, y))
+        lives += int(self.cell(top, right))
+        lives += int(self.cell(x, left))
+        lives += int(self.cell(x, right))
+        lives += int(self.cell(bottom, left))
+        lives += int(self.cell(bottom, y))
+        lives += int(self.cell(bottom, right))
 
         return lives
 # end class Grid
@@ -71,22 +70,29 @@ class App:
         self.size = 12  # cell width/heigh in pixels
         self.job = None # current job id for root.after()
 
-        # Create the grid.
         self.grid = Grid(self.n)
 
+    """Initialize the window and start the main event loop."""
     def main(self):
-        """Create the window and start the main event loop."""
-        # TODO: Refactor (shorten) this method.
-        # Create the root window.
+        self._create_widgets()
+        self._draw_grid()
+
+        self.root.mainloop()
+    
+    """Create the window, canvas, and play/pause button."""
+    def _create_widgets(self):
         self.root = tkinter.Tk()
         self.root.title("Conway's Game of Life")
 
-        # Create the canvas.
         sz = self.n * self.size
         self.canvas = tkinter.Canvas(self.root, width=sz, height=sz)
         self.canvas.pack()
+        
+        self.button = tkinter.Button(self.root, text="Play", command=self._play)
+        self.button.pack(expand=tkinter.YES, fill=tkinter.BOTH)
 
-        # Draw the initial grid to the canvas.
+    """Draw the initial state of the grid to the canvas."""
+    def _draw_grid(self):
         for x in range(self.n):
             for y in range(self.n):
                 x0 = x * self.size
@@ -98,18 +104,11 @@ class App:
                 else:
                     color = "black"
                 self.canvas.create_rectangle(x0, y0, x1, y1, fill=color)
-        
-        # Create the play/pause button.
-        self.button = tkinter.Button(self.root, text="Play", command=self.play)
-        self.button.pack(expand=tkinter.YES, fill=tkinter.BOTH)
 
-        # Start the Tk event loop.
-        self.root.mainloop()
-
-    def play(self):
-        """Insert comments here."""
-        self.job = self.root.after(500, self.play)
-        self.button.config(text="Pause", command=self.pause)
+    """Start the game."""
+    def _play(self):
+        self.job = self.root.after(500, self._play)
+        self.button.config(text="Pause", command=self._pause)
         for cell, is_alive in self.grid.update():
             id = (cell[0] * self.n) + cell[1] + 1 # TODO: Explain this.
             if is_alive:
@@ -117,10 +116,10 @@ class App:
             else:
                 self.canvas.itemconfig(id, fill="black")
 
-    def pause(self):
-        """Insert comments here."""
+    """Stop the game."""
+    def _pause(self):
         self.root.after_cancel(self.job)
-        self.button.config(text="Play", command=self.play)
+        self.button.config(text="Play", command=self._play)
 # end class App
 
 
