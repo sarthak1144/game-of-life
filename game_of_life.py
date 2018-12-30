@@ -33,7 +33,7 @@ class Grid:
     """Update the state of the grid."""
     def update(self):
         self._new_cells = deepcopy(self._cells)
-        self._changed_cells = []
+        self._changed_cells = [] # list of (x, y) tuples
 
         self._update_cells()
 
@@ -77,6 +77,7 @@ class Grid:
         lives += int(self.cell(bottom, right))
 
         return lives
+
 # end class Grid
 
 
@@ -132,7 +133,9 @@ class App:
     def _play(self):
         self._current_job = self._root.after(500, self._play)
         self._btn.config(text="Pause", command=self._pause)
-        for cell in self._grid.update():
+
+        updated_cells = self._grid.update()
+        for cell in updated_cells:
             x, y = cell
             id = (x * self._n) + y + 1 # rectangle item id for window's canvas
             if self._grid.cell(x, y):
@@ -145,6 +148,7 @@ class App:
     def _pause(self):
         self._root.after_cancel(self._current_job)
         self._btn.config(text="Play", command=self._play)
+        
 # end class App
 
 
