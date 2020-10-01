@@ -1,5 +1,11 @@
 # Conway's Game of Life
 
+
+<p align="center">
+  <img src="_con.jpg" width=400 alt="logo"/>
+</p>
+
+
 ###### Bradley Gatewood - www.btgatewood.com - December 2018
 
 ### Purpose
@@ -18,4 +24,7 @@ Algorithm:
 	a.	Update the value of cell (x, y) based on its neighbors using toroidal boundary conditions.
 	b.	Update the display of grid values.
 
-
+####What you have to do
+1.      just clone/download this repository 
+2.      confirm you have python on your machine
+3.      now run this command `python game_of_life.py` and play 
