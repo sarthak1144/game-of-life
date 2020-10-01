@@ -2,9 +2,6 @@
 
 ###### Bradley Gatewood - www.btgatewood.com - December 2018
 
-### Usage
-> python game_of_life.py
-
 ### Purpose
 The purpose of this project is to develop an interactive version of Conway's Game of Life using the Python 3 language and Tkinter GUI package.  This project and all associated activities (i.e. design, development, testing, etc.) are undertaken as a personal learning exercise for the project’s creator.
 
