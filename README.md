@@ -28,3 +28,4 @@ Algorithm:
 1.      just clone/download this repository 
 2.      confirm you have python on your machine
 3.      now run this command `python game_of_life.py` and play 
+Awesome writing
